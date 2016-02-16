@@ -16,6 +16,7 @@ class Feature(ndb.Model):
 
     name = ndb.StringProperty(required=True)
     summary = ndb.TextProperty()
+    KPIs = ndb.StringProperty(repeated=True)
     performances = ndb.KeyProperty(kind=FeaturePerformance, repeated=True)
     # report = ndb.KeyProperty(kind=Report, repeated=True)
     created_time = ndb.DateTimeProperty(auto_now_add=True)
