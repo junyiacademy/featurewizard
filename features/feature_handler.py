@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from handlers import BaseHandler
-from feature_models import Feature, FeatureBet
-from datetime import timedelta
+from feature_models import Feature, FeatureBet, FeaturePerformance
+import datetime
 from user_data.user_models import UserData
 from google.appengine.api import memcache
 from oauth2client.appengine import AppAssertionCredentials
 import httplib2
 from apiclient.discovery import build
+import logging
 
 # credentials = AppAssertionCredentials(scope='https://www.googleapis.com/auth/drive')
 # http = credentials.authorize(httplib2.Http(memcache))
@@ -34,6 +35,17 @@ class CreateFeature(BaseHandler):
                             KPIs=KPIs.strip().split(','),
                             )
         new_feature.put()
+
+        # [TODO]Benny: scheduled_update_date超醜，要改掉
+        # [TODO]Benny: new_feature_performance要搬到CreateFeaturePerformance 這個handler
+        scheduled_update_date_str = self.request.get('scheduled_update_date')
+        scheduled_update_date_arr = scheduled_update_date_str.split('-')
+        scheduled_update_date = datetime.datetime(int(scheduled_update_date_arr[0]), int(scheduled_update_date_arr[1]), int(scheduled_update_date_arr[2]))
+        index = self.request.get('performance_index')
+        new_feature_performance = FeaturePerformance(
+            scheduled_update_date=scheduled_update_date,
+            index=index)
+        new_feature_performance.put()
 
         self.redirect('/')  # 
 
@@ -115,4 +127,12 @@ class UpdateUserFeatureBet(BaseHandler):
 
         # update user's bet on certain feature_bet
         # remember to check if user is already bet on this feature_bet
+        pass
+
+class ShowPerformance(BaseHandler):
+
+    def get(self):
+        logging.info('ShowPerformance')
+        user = UserData.get_current_user()
+        return self.render('feature/show-performance.html', None)
         pass
