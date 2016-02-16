@@ -28,6 +28,7 @@ app = webapp2.WSGIApplication([
 
                               (r'/show-feature/(\d+)', feature_handler.ShowFeature),
                               (r'/list-features', feature_handler.ListFeatures),
+                              (r'/update_user_feature_bet', feature_handler.UpdateUserFeatureBet),
                               (r'/profile', profile.Profile),
                               (r'/comment-update', comment_handler.CommentUpdate),
                               # Login Page

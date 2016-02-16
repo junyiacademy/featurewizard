@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from handlers import BaseHandler
-from feature_models import Feature, FeatureBet, FeaturePerformance
+from feature_models import Feature, FeatureBet, FeaturePerformance, UserFeatureBet
 import datetime
 from user_data.user_models import UserData
 from google.appengine.api import memcache
@@ -78,6 +78,8 @@ class ShowFeature(BaseHandler):
         user = UserData.get_current_user()
         feature = Feature.get_by_id(int(feature_id))
         feature_KPIs = ','.join(feature.KPIs)
+        feature_performance = feature.performances[0].get()
+        feature_bets = FeatureBet.get_by_feature_performance(feature_performance)
 
         # get feature bets by feature
         # get user_feature bets by feature bets
@@ -87,8 +89,8 @@ class ShowFeature(BaseHandler):
         data = {
             'feature': feature,
             'feature_KPIs': feature_KPIs,
-            'feature_bets': '{{}}',
-            'feature_performance': '{{}}'
+            'feature_bets': feature_bets,
+            'feature_performance': feature_performance
         }
 
         return self.render('feature/show-feature.html', data)
@@ -159,9 +161,19 @@ class UpdateUserFeatureBet(BaseHandler):
 
     def post(self):
 
-        # update user's bet on certain feature_bet
-        # remember to check if user is already bet on this feature_bet
-        pass
+        user = UserData.get_current_user()
+        feature_bet_id = self.request.get('feature-bet-id')
+        bet_option_index = self.request.get('bet-option')
+        bet_capital = self.request.get('bet-capital')
+
+        feature_bet = FeatureBet.get_by_id(int(feature_bet_id))
+
+        user_bet = UserFeatureBet(user=user.key,
+                                 feature_bet=feature_bet.key,
+                                 option_index_bet=int(bet_option_index),
+                                 bet_capital=float(bet_capital))
+        user_bet.put()
+
 
 class ListFeaturePerformance(BaseHandler):
 

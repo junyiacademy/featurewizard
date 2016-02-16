@@ -6,18 +6,49 @@
 {% endblock%}
 {% block content %}
 <div class="col-sm-4 col-md-3 sidebar">
-  <h3 class="sub-header">{{feature.name}}</h2> 
-  <h4 class="sub-header">描述：{{feature.summary}}</h3>
-  <h4 class="sub-header">KPIs：{{feature_KPIs}}</h3>
+  <h3 class="sub-header">{{feature.name}}</h3> 
+  <h4 class="sub-header">描述：{{feature.summary}}</h4>
+  <h4 class="sub-header">KPIs：{{feature_KPIs}}</h4>
 </div>
 <div class="col-sm-9 col-sm-offset-4 col-md-10 col-md-offset-3 main">
-
-<!-- First Show , feature bet, feature performance data in the properway-->
-
+  <form method="POST" action="" enctype="multipart/form-data" data-js="create-user-feature-bet">
+  <h3 class="sub-header">賭局：</h3> 
+  	<input name="feature-bet-id" style="display:none" value={{feature_bets[0].key.id()}}>
+	{% for option in feature_bets[0].bet_options %}
+		<input type="radio" name="bet-option" value={{loop.index}}>{{option}}<br>
+	{% endfor %}
+	<div class="input-group">
+    	<label for="bet-capital">下注金額</label>
+    	<input type="text" class="form-control" id="bet-capital" name="bet-capital">
+  	</div><br>
+	</form>
+	<button data-js="bet_on_option" class="btn btn-primary">下注</button>
+    <div class="alert alert-success" role="alert" style="display:none; width:400px; margin: 0px auto;" data-js="class-reg-success">投注成功！！</div>
+    <div class="alert alert-danger" role="alert" style="display:none; width:400px; margin: 0px auto;" data-js="class-reg-failure"></div>
 <!-- User Can Click on the feature bet option to take a bet-->
 </div>
 {% endblock %}
 {% block javascript%}
 <script>
+  $(document).ready(function() { 
+    $('[data-js="bet_on_option"]').on('click', function() {
+        var form_data_list = $('[data-js="create-user-feature-bet"]').serializeArray();
+        $.ajax({
+            url: "/update_user_feature_bet",
+            method: "POST",
+            data: form_data_list,
+            dataType: 'json',
+            success: function(data) {
+                        data = JSON.parse(data);
+                        if (data.hasOwnProperty('error_msg')) {
+                            $('[data-js="class-reg-failure"]').text(data['error_msg']).show();
+                        } else {
+                            $('[data-js="class-reg-failure"]').hide();
+                            $('[data-js="class-reg-success"]').text(data['success_msg'] + '，我們將在 5 秒鐘後跳轉到排名頁面。').show();
+                        }
+                    },
+        });
+    });
+  });
 </script>
 {% endblock%}

@@ -34,6 +34,11 @@ class FeatureBet(ndb.Model):
     end_time = ndb.DateTimeProperty()
     billing_time = ndb.DateTimeProperty()
 
+    @classmethod
+    def get_by_feature_performance(cls, fp):
+        feature_bets = cls.query(cls.performance_bet==fp.key).fetch()
+        return feature_bets
+
 
 class UserFeatureBet(ndb.Model):
     user = ndb.KeyProperty(kind=user_models.UserData)
