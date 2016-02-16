@@ -45,4 +45,5 @@ class UserFeatureBet(ndb.Model):
     feature_bet = ndb.KeyProperty(kind=FeatureBet)
     option_index_bet = ndb.IntegerProperty()
     bet_capital = ndb.FloatProperty()
-
+    win_bet = ndb.BooleanProperty()
+    bet_state = ndb.StringProperty(choices=['can change', 'pending', 'closed'])

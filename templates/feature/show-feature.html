@@ -13,7 +13,10 @@
 <div class="col-sm-9 col-sm-offset-4 col-md-10 col-md-offset-3 main">
 {% if feature_bets[0] %}
   <form method="POST" action="" enctype="multipart/form-data" data-js="create-user-feature-bet">
+  <h3 class="sub-header">您目前擁有的金額：</h3> 
+  <h4>{{user.capital}}</h4>
   <h3 class="sub-header">賭局：</h3> 
+  <h4>投注標的：{{feature_performance.index}}</h4>
   	<input name="feature-bet-id" style="display:none" value={{feature_bets[0].key.id()}}>
 	{% for option in feature_bets[0].bet_options %}
 		<input type="radio" name="bet-option" value={{loop.index}}>{{option}}<br>
@@ -24,7 +27,7 @@
   	</div><br>
 	</form>
 	<button data-js="bet_on_option" class="btn btn-primary">下注</button>
-    <div class="alert alert-success" role="alert" style="display:none; width:400px; margin: 0px auto;" data-js="class-reg-success">投注成功！！</div>
+    <div class="alert alert-success" role="alert" style="display:none; width:400px; margin: 0px auto;" data-js="class-reg-success"></div>
     <div class="alert alert-danger" role="alert" style="display:none; width:400px; margin: 0px auto;" data-js="class-reg-failure"></div>
 {% endif %}
 <!-- User Can Click on the feature bet option to take a bet-->
@@ -41,12 +44,11 @@
             data: form_data_list,
             dataType: 'json',
             success: function(data) {
-                        data = JSON.parse(data);
                         if (data.hasOwnProperty('error_msg')) {
                             $('[data-js="class-reg-failure"]').text(data['error_msg']).show();
                         } else {
                             $('[data-js="class-reg-failure"]').hide();
-                            $('[data-js="class-reg-success"]').text(data['success_msg'] + '，我們將在 5 秒鐘後跳轉到排名頁面。').show();
+                            $('[data-js="class-reg-success"]').text(data['success_msg']).show();
                         }
                     },
         });
