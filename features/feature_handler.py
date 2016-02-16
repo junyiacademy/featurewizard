@@ -8,6 +8,7 @@ from google.appengine.api import memcache
 from oauth2client.appengine import AppAssertionCredentials
 import httplib2
 from apiclient.discovery import build
+import json
 import logging
 
 # credentials = AppAssertionCredentials(scope='https://www.googleapis.com/auth/drive')
@@ -168,9 +169,31 @@ class ListFeaturePerformance(BaseHandler):
     def get(self):
         logging.info('ShowPerformance')
         user = UserData.get_current_user()
-        feature_performances = FeaturePerformance.query().fetch()
+        features = Feature.query().fetch()
+        feature_performances = []
+        for feature in features:
+            performance = feature.performances[0].get()
+            feature_performances.append({
+                'name': feature.name,
+                'index': performance.index,
+                'scheduled_update_date': performance.scheduled_update_date,
+                'key': performance.key.id()
+            })
+        logging.info('feature_performances: %s' %feature_performances)
         data = {
             'feature_performances': feature_performances
         }
         return self.render('feature/show-performance.html', data)
-        pass
+
+class ModifyFeaturePerformance(BaseHandler):
+
+    def post(self):
+        data = json.loads(self.request.body)
+        index = data['index']
+        scheduled_update_date = data['scheduled_update_date']
+        key_id = data['key_id']
+        feature_performance = FeaturePerformance.get_by_id(int(key_id))
+        feature_performance.index = index
+        feature_performance.put()
+        return
+

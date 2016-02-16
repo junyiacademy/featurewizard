@@ -5,33 +5,88 @@
 <link href="/static/css/fileinput.min.css" media="all" rel="stylesheet" type="text/css" />
 {% endblock%}
 {% block content %}
-hello world~
 <div class='row'>
-  <h1 class='page-header text-center'>交易記錄</h1>
+  <h1 class='page-header text-center'>performance 紀錄</h1>
 </div>
 <div class='row'>
   <table class="table">
     <thead>
       <tr>
         <th>功能名稱</th>
-        <th>簡介</th>
-        <th>KPIS</th>
-        <th>創造時間</th>
-        <th>完成時間</th>
+        <th>index</th>
+        <th>預計結算日</th>
+        <th>修改performance</th>
+        <th>結算performance</th>
       </tr>
     </thead>
     <tbody>
-      {% for feature in features %}
+      {% for feature_performance in feature_performances %}
         <tr>
-          <td><a href="/show-feature/{{feature.key.id()}}">
-{{feature.name}}</a></td>
-          <td>{{feature.summary}}</td>
-          <td>{{feature_KPIs[loop.index0]}}</td>
+          <td>{{feature_performance.name}}</td>
+          <td>{{feature_performance.index}}</td>
+          <td>{{feature_performance.scheduled_update_date}}</td>
+          <td><button data_key='{{feature_performance.key}}' class="btn btn-primary modify" data-toggle="modal" data-target="#myModal">修改</button></td>
+          <td><button data_key='{{feature_performance.key}}' class="btn btn-primary finish">結算</button></td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">修改 performance</h4>
+      </div>
+      <div class="modal-body">
+      	<div class="input-group">
+		    <label for="performance">Performance 指標</label>
+		    <textarea class="form-control" id="performance_index" name="performance_index" rows="1" placeholder="指標"></textarea> <br>
+		    <label for="performance">Performance 結算日</label>
+		    <textarea class="form-control" id="scheduled_update_date" name="scheduled_update_date" rows="1" placeholder="2016-1-1"></textarea> 
+		  </div><br>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+        <button id='save-modify' type="button" class="btn btn-primary">儲存修改</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 {% block javascript%}
+<script>
+  $(document).ready(function() {
+  	$('.modify').on('click', function() {
+  		$('#save-modify').attr('performance_key', $(this).attr('data_key'));
+  		console.log($(this).attr('data_key'));
+  	});
+  	$('#save-modify').on('click', function() {
+  		var index = $('#performance_index').val();
+  		var scheduled_update_date = $('#scheduled_update_date').val();
+  		var key_id = $(this).attr('performance_key');
+  		var performance_data = {
+  			"index": index,
+  			"scheduled_update_date": scheduled_update_date,
+  			"key_id": key_id
+  		}
+
+  		$.ajax({
+            type: 'POST',
+            url: '/modify-performance',
+            data: JSON.stringify(performance_data),
+            contentType: 'application/json; charset=utf-8',
+            success: function(data) {
+            	$('#myModal').modal('toggle')
+            },
+            error: function() {
+            	console.log('error');
+            }
+
+        });
+  	})
+  });
+</script>
 {% endblock%}
