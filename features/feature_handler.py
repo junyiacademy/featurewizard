@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from handlers import BaseHandler
-from feature_models import Feature, FeatureBet, FeaturePerformance
+from feature_models import Feature, FeatureBet, FeaturePerformance, UserFeatureBet
 import datetime
 from user_data.user_models import UserData
 from google.appengine.api import memcache
@@ -38,7 +38,6 @@ class CreateFeature(BaseHandler):
             scheduled_update_date=scheduled_update_date,
             index=index)
         new_feature_performance.put()
-
         feature_name = self.request.get('feature-name')
         summary = self.request.get('summary')
         KPIs = self.request.get('KPI')
@@ -51,7 +50,7 @@ class CreateFeature(BaseHandler):
 
 
 
-        self.redirect('/')  # 
+        self.redirect('/show-feature/%s' % new_feature.key.id()) # 
 
 
 class ListFeatures(BaseHandler):
@@ -80,6 +79,8 @@ class ShowFeature(BaseHandler):
         user = UserData.get_current_user()
         feature = Feature.get_by_id(int(feature_id))
         feature_KPIs = ','.join(feature.KPIs)
+        feature_performance = feature.performances[0].get()
+        feature_bets = FeatureBet.get_by_feature_performance(feature_performance)
 
         # get feature bets by feature
         # get user_feature bets by feature bets
@@ -89,8 +90,8 @@ class ShowFeature(BaseHandler):
         data = {
             'feature': feature,
             'feature_KPIs': feature_KPIs,
-            'feature_bets': '{{}}',
-            'feature_performance': '{{}}'
+            'feature_bets': feature_bets,
+            'feature_performance': feature_performance
         }
 
         return self.render('feature/show-feature.html', data)
@@ -121,7 +122,6 @@ class CreateFeatureBet(BaseHandler):
         performances = FeaturePerformance.query().fetch()
         data = {
             'features': features,
-            'performances': performances
         }
         return self.render('feature/create-feature-bet.html', data)
         
@@ -136,15 +136,16 @@ class CreateFeatureBet(BaseHandler):
         feature_key = self.request.get('feature_wanted')
         feature = Feature.get_by_id(int(feature_key))
 
-        performance_key = self.request.get('performance_wanted')
-        performance = FeaturePerformance.get_by_id(int(performance_key))
-
         options = self.request.get('options').split('\n')
-        start_time = self.request.get('start_time')
-        end_time = self.request.get('end_time')
-        billing_time = self.request.get('billing_time')
+        start_time = self.request.get('start-time')
+        start_time = datetime.datetime.strptime(start_time, "%Y-%m-%d")
+        end_time = self.request.get('end-time')
+        end_time = datetime.datetime.strptime(end_time, "%Y-%m-%d")
 
-        new_bet = FeatureBet(performance_bet=performance,
+        billing_time = self.request.get('billing-time')
+        billing_time = datetime.datetime.strptime(billing_time, "%Y-%m-%d")
+
+        new_bet = FeatureBet(performance_bet=feature.performances[0],
                             bet_options=options,
                             start_time=start_time,
                             end_time=end_time,
@@ -153,16 +154,27 @@ class CreateFeatureBet(BaseHandler):
 
         new_bet.put()
 
-        self.redirect('/')  # 
+        self.redirect('/show-feature/%s' % feature.key.id()) # 
+# 
 
 
 class UpdateUserFeatureBet(BaseHandler):
 
     def post(self):
 
-        # update user's bet on certain feature_bet
-        # remember to check if user is already bet on this feature_bet
-        pass
+        user = UserData.get_current_user()
+        feature_bet_id = self.request.get('feature-bet-id')
+        bet_option_index = self.request.get('bet-option')
+        bet_capital = self.request.get('bet-capital')
+
+        feature_bet = FeatureBet.get_by_id(int(feature_bet_id))
+
+        user_bet = UserFeatureBet(user=user.key,
+                                 feature_bet=feature_bet.key,
+                                 option_index_bet=int(bet_option_index),
+                                 bet_capital=float(bet_capital))
+        user_bet.put()
+
 
 class ListFeaturePerformance(BaseHandler):
 

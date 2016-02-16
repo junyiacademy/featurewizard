@@ -11,6 +11,7 @@ class UserData(ndb.Model):
     user_account_type = ndb.StringProperty(default="google_account")
     # attr of UserProperty: id, email, nickname
     created_time = ndb.DateTimeProperty(auto_now_add=True)
+    capital = ndb.FloatProperty(default=10000)
 
     @classmethod
     def get_current_user(cls):
