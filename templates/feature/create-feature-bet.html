@@ -17,15 +17,6 @@
   </div><br>
 
   <div>
-    <label>目標KPI</label><br>
-    <select id='performance_wanted' name='performance_wanted'>
-    {% for performance in performances %}
-      <option value={{performance.key.id()}}>{{performance.index}}</option>
-    {% endfor %}
-    </select>
-  </div><br>
-
-  <div>
     <label>賭注選項</label><br>
     <textarea type='text' name='options' rows='6' placeholder='每個選項換一行'></textarea>
   </div><br>

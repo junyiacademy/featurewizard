@@ -34,6 +34,7 @@ app = webapp2.WSGIApplication([
                               (r'/login-page', login.LoginPage),
                               (r'/logout', login.Logout),
                               (r'/login', login.Login),
+                              (r'/show-performance', feature_handler.ShowPerformance),
 
                               # Error Pages
                               (r'/*', homepage.NotFoundPage),

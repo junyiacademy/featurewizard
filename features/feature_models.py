@@ -6,10 +6,12 @@ from user_data import user_models
 
 class FeaturePerformance(ndb.Model):
 
+    # 真正的結算日
     measured_date = ndb.DateTimeProperty()
     index = ndb.StringProperty()  # should be one of feature KPIs
     value = ndb.FloatProperty()
-    scheduled_update = ndb.DateTimeProperty()
+    # 到期日(可更改延後)
+    scheduled_update_date = ndb.DateTimeProperty()
 
 
 class Feature(ndb.Model):
