@@ -132,21 +132,17 @@ class CreateFeatureBet(BaseHandler):
 
         feature_key = self.request.get('feature_wanted')
         feature = Feature.get_by_id(int(feature_key))
-        logging.info("feature performances")
-        logging.info(feature.performances)
-
-        performance = FeaturePerformance(feature.performances[0])
 
         options = self.request.get('options').split('\n')
-        start_time = self.request.get('start_time')
-        start_time = datetime.strptime(start_time, "%Y-%m-%d")
-        end_time = self.request.get('end_time')
-        end_time = datetime.strptime(end_time, "%Y-%m-%d")
+        start_time = self.request.get('start-time')
+        start_time = datetime.datetime.strptime(start_time, "%Y-%m-%d")
+        end_time = self.request.get('end-time')
+        end_time = datetime.datetime.strptime(end_time, "%Y-%m-%d")
 
-        billing_time = self.request.get('billing_time')
-        billing_time = datetime.strptime(billing_time, "%Y-%m-%d")
+        billing_time = self.request.get('billing-time')
+        billing_time = datetime.datetime.strptime(billing_time, "%Y-%m-%d")
 
-        new_bet = FeatureBet(performance_bet=performance,
+        new_bet = FeatureBet(performance_bet=feature.performances[0],
                             bet_options=options,
                             start_time=start_time,
                             end_time=end_time,
@@ -155,7 +151,8 @@ class CreateFeatureBet(BaseHandler):
 
         new_bet.put()
 
-        self.redirect('/')  # 
+        self.redirect('/show-feature/%s' % feature.key.id()) # 
+# 
 
 
 class UpdateUserFeatureBet(BaseHandler):
