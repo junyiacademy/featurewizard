@@ -25,20 +25,20 @@
           <td>{{feature_performance.name}}</td>
           <td>{{feature_performance.index}}</td>
           <td>{{feature_performance.scheduled_update_date}}</td>
-          <td><button data_key='{{feature_performance.key}}' class="btn btn-primary modify" data-toggle="modal" data-target="#myModal">修改</button></td>
-          <td><button data_key='{{feature_performance.key}}' class="btn btn-primary finish">結算</button></td>
+          <td><button data_key='{{feature_performance.key}}' class="btn btn-primary modify" data-toggle="modal" data-target="#modify-modal">修改</button></td>
+          <td><button data_key='{{feature_performance.key}}' class="btn btn-primary finish" data-toggle="modal" data-target="#finish-modal">結算</button></td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
 <!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="modify-modal" tabindex="-1" role="dialog" aria-labelledby="modify-modal-Label">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">修改 performance</h4>
+        <h4 class="modal-title" id="modify-modal-Label">修改 performance</h4>
       </div>
       <div class="modal-body">
       	<div class="input-group">
@@ -55,12 +55,39 @@
     </div>
   </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="finish-modal" tabindex="-1" role="dialog" aria-labelledby="finish-modal-Label">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="finish-modal-Label">結算value</h4>
+      </div>
+      <div class="modal-body">
+      	<div class="input-group">
+		    <label for="performance">value</label>
+		    <textarea class="form-control" id="performance_value" name="performance_index" rows="1" placeholder="0.05"></textarea> <br>
+		  </div><br>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+        <button id='finish-performance' type="button" class="btn btn-primary">結算</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 {% block javascript%}
 <script>
   $(document).ready(function() {
   	$('.modify').on('click', function() {
   		$('#save-modify').attr('performance_key', $(this).attr('data_key'));
+  		console.log($(this).attr('data_key'));
+  	});
+  	$('.finish').on('click', function() {
+  		$('#finish-performance').attr('performance_key', $(this).attr('data_key'));
   		console.log($(this).attr('data_key'));
   	});
   	$('#save-modify').on('click', function() {
@@ -79,7 +106,29 @@
             data: JSON.stringify(performance_data),
             contentType: 'application/json; charset=utf-8',
             success: function(data) {
-            	$('#myModal').modal('toggle')
+            	$('#modify-modal').modal('toggle')
+            },
+            error: function() {
+            	console.log('error');
+            }
+
+        });
+  	});
+  	$('#finish-performance').on('click', function() {
+  		var value = $('#performance_value').val();
+  		var key_id = $(this).attr('performance_key');
+  		var performance_data = {
+  			"value": value,
+  			"key_id": key_id
+  		}
+
+  		$.ajax({
+            type: 'POST',
+            url: '/finish-performance',
+            data: JSON.stringify(performance_data),
+            contentType: 'application/json; charset=utf-8',
+            success: function(data) {
+            	$('#finish-modal').modal('toggle')
             },
             error: function() {
             	console.log('error');

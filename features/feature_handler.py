@@ -30,14 +30,15 @@ class CreateFeature(BaseHandler):
 
         # [TODO]Benny: scheduled_update_date超醜，要改掉
         # [TODO]Benny: new_feature_performance要搬到CreateFeaturePerformance 這個handler
-        scheduled_update_date_str = self.request.get('scheduled_update_date')
-        scheduled_update_date_arr = scheduled_update_date_str.split('-')
-        scheduled_update_date = datetime.datetime(int(scheduled_update_date_arr[0]), int(scheduled_update_date_arr[1]), int(scheduled_update_date_arr[2]))
+        scheduled_update_date = self.request.get('scheduled_update_date')
+        scheduled_update_date = datetime.datetime.strptime(scheduled_update_date, "%Y-%m-%d")
+        logging.info('scheduled_update_date: %s' %scheduled_update_date)
         index = self.request.get('performance_index')
         new_feature_performance = FeaturePerformance(
             scheduled_update_date=scheduled_update_date,
             index=index)
         new_feature_performance.put()
+
         feature_name = self.request.get('feature-name')
         summary = self.request.get('summary')
         KPIs = self.request.get('KPI')
@@ -203,9 +204,24 @@ class ModifyFeaturePerformance(BaseHandler):
         data = json.loads(self.request.body)
         index = data['index']
         scheduled_update_date = data['scheduled_update_date']
+        scheduled_update_date = datetime.datetime.strptime(scheduled_update_date, "%Y-%m-%d")
         key_id = data['key_id']
         feature_performance = FeaturePerformance.get_by_id(int(key_id))
-        feature_performance.index = index
+        if index:
+            feature_performance.index = index
+        if scheduled_update_date:
+            feature_performance.scheduled_update_date = scheduled_update_date
         feature_performance.put()
         return
 
+class FinishFeaturePerformance(BaseHandler):
+
+    def post(self):
+        data = json.loads(self.request.body)
+        value = data['value']
+        key_id = data['key_id']
+        feature_performance = FeaturePerformance.get_by_id(int(key_id))
+        feature_performance.measured_date = datetime.datetime.now()
+        feature_performance.value = float(value)
+        feature_performance.put()
+        return
