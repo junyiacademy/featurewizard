@@ -44,7 +44,7 @@ class Login(BaseHandler):
                                 user_nickname=google_user_property.nickname()
                                 )
             new_user.put()
-        self.redirect('/find-course')
+        self.redirect('/')
 
 
 class Logout(BaseHandler):

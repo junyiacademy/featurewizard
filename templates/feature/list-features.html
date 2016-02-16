@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}功能呈現頁面{% endblock %}
+{% block css%}
+<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/css/select2.min.css" rel="stylesheet" />
+{% endblock%}
+{% block content %}
+<div class='row'>
+  <h1 class='page-header text-center'>交易記錄</h1>
+</div>
+<div class='row'>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>功能名稱</th>
+        <th>簡介</th>
+        <th>KPIS</th>
+        <th>創造時間</th>
+        <th>完成時間</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for feature in features %}
+        <tr>
+          <td><a href="/show-feature/{{feature.key.id()}}">
+{{feature.name}}</a></td>
+          <td>{{feature.summary}}</td>
+          <td>{{feature_KPIs[loop.index0]}}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
+{% block javascript%}
+<script>
+</script>
+{% endblock%}

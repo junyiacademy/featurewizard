@@ -4,8 +4,10 @@ import webapp2
 
 import homepage
 import login
-from resource import resource_handler
-from subject import subject_handler
+from features import feature_handler
+from comment import comment_handler
+import profile
+
 
 config = {}
 config['webapp2_extras.sessions'] = {
@@ -18,23 +20,20 @@ app = webapp2.WSGIApplication([
                               # Admin
 
                               # Home Page
-                              (r'/', resource_handler.FindResource),
+                              (r'/', feature_handler.ListFeatures),
 
-                              # Course Page
-                              (r'/create-course', resource_handler.CreateResource),
-                              (r'/show-course/(\d+)', resource_handler.ShowResource),
-                              (r'/find-course', resource_handler.FindResource),
-                              (r'/my-course', resource_handler.MyResource),
-                              (r'/material-download-update', resource_handler.ContentDownloadUpdate),
-                              (r'/course-comment-update', resource_handler.CommentUpdate),
+                              # Admin Page
+                              (r'/admin/create-feature', feature_handler.CreateFeature),
+                              (r'/admin/create-feature-bet', feature_handler.CreateFeatureBet),
+
+                              (r'/show-feature/(\d+)', feature_handler.ShowFeature),
+                              (r'/list-features', feature_handler.ListFeatures),
+                              (r'/profile', profile.Profile),
+                              (r'/comment-update', comment_handler.CommentUpdate),
                               # Login Page
                               (r'/login-page', login.LoginPage),
                               (r'/logout', login.Logout),
                               (r'/login', login.Login),
-                              # admin Page
-                              (r'/admin/upload-subject-tree', subject_handler.UploadSubjectTree),
-                              (r'/admin/delete-subject-tree/(\d+)', subject_handler.DeleteSubjectTree),
-
 
                               # Error Pages
                               (r'/*', homepage.NotFoundPage),
