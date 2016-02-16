@@ -9,9 +9,9 @@ from oauth2client.appengine import AppAssertionCredentials
 import httplib2
 from apiclient.discovery import build
 
-credentials = AppAssertionCredentials(scope='https://www.googleapis.com/auth/drive')
-http = credentials.authorize(httplib2.Http(memcache))
-service = build('drive', 'v2', http=http)
+# credentials = AppAssertionCredentials(scope='https://www.googleapis.com/auth/drive')
+# http = credentials.authorize(httplib2.Http(memcache))
+# service = build('drive', 'v2', http=http)
 
 
 class CreateFeature(BaseHandler):

@@ -16,7 +16,6 @@ class Feature(ndb.Model):
 
     name = ndb.StringProperty(required=True)
     summary = ndb.TextProperty()
-    KPIs = ndb.StringProperty(repeated=True)
     performances = ndb.KeyProperty(kind=FeaturePerformance, repeated=True)
     # report = ndb.KeyProperty(kind=Report, repeated=True)
     created_time = ndb.DateTimeProperty(auto_now_add=True)
@@ -25,7 +24,6 @@ class Feature(ndb.Model):
 
 class FeatureBet(ndb.Model):
 
-    feature = ndb.KeyProperty(required=True, kind=Feature)
     performance_bet = ndb.KeyProperty(kind=FeaturePerformance)
     bet_options = ndb.StringProperty(repeated=True)
     win_option_index = ndb.IntegerProperty()
@@ -39,3 +37,4 @@ class UserFeatureBet(ndb.Model):
     feature_bet = ndb.KeyProperty(kind=FeatureBet)
     option_index_bet = ndb.IntegerProperty()
     bet_capital = ndb.FloatProperty()
+
