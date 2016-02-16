@@ -87,6 +87,7 @@ class ShowFeature(BaseHandler):
 
         # show all these data in the proper way
         data = {
+            'user': user,
             'feature': feature,
             'feature_KPIs': feature_KPIs,
             'feature_bets': feature_bets,
@@ -167,13 +168,22 @@ class UpdateUserFeatureBet(BaseHandler):
         bet_capital = self.request.get('bet-capital')
 
         feature_bet = FeatureBet.get_by_id(int(feature_bet_id))
+        if user.capital < float(bet_capital):
+            self.render_json(({"error_msg": "你根本沒有那麼多錢！您太貪心了！！"}))
+            return
 
         user_bet = UserFeatureBet(user=user.key,
                                  feature_bet=feature_bet.key,
                                  option_index_bet=int(bet_option_index),
-                                 bet_capital=float(bet_capital))
+                                 bet_capital=float(bet_capital),
+                                 bet_state='can change')
         user_bet.put()
+        user.capital = user.capital - float(bet_capital)
+        user.put()
 
+        logging.info("finish final result")
+        self.render_json({"success_msg": "投注成功！！"})
+        return
 
 class ListFeaturePerformance(BaseHandler):
 
@@ -185,4 +195,3 @@ class ListFeaturePerformance(BaseHandler):
             'feature_performances': feature_performances
         }
         return self.render('feature/show-performance.html', data)
-        pass
