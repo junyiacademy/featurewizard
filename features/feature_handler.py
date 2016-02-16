@@ -27,15 +27,6 @@ class CreateFeature(BaseHandler):
         if not user.is_server_admin():  # make sure user has an account to create course
             self.redirect('/')
 
-        feature_name = self.request.get('feature-name')
-        summary = self.request.get('summary')
-        KPIs = self.request.get('KPI')
-        new_feature = Feature(name=feature_name,
-                            summary=summary,
-                            KPIs=KPIs.strip().split(','),
-                            )
-        new_feature.put()
-
         # [TODO]Benny: scheduled_update_date超醜，要改掉
         # [TODO]Benny: new_feature_performance要搬到CreateFeaturePerformance 這個handler
         scheduled_update_date_str = self.request.get('scheduled_update_date')
@@ -46,6 +37,17 @@ class CreateFeature(BaseHandler):
             scheduled_update_date=scheduled_update_date,
             index=index)
         new_feature_performance.put()
+        feature_name = self.request.get('feature-name')
+        summary = self.request.get('summary')
+        KPIs = self.request.get('KPI')
+        new_feature = Feature(name=feature_name,
+                            summary=summary,
+                            KPIs=KPIs.strip().split(','),
+                            performances=[new_feature_performance.key]
+                            )
+        new_feature.put()
+
+
 
         self.redirect('/show-feature/%s' % new_feature.key.id()) # 
 
@@ -164,10 +166,14 @@ class UpdateUserFeatureBet(BaseHandler):
         # remember to check if user is already bet on this feature_bet
         pass
 
-class ShowPerformance(BaseHandler):
+class ListFeaturePerformance(BaseHandler):
 
     def get(self):
         logging.info('ShowPerformance')
         user = UserData.get_current_user()
-        return self.render('feature/show-performance.html', None)
+        feature_performances = FeaturePerformance.query().fetch()
+        data = {
+            'feature_performances': feature_performances
+        }
+        return self.render('feature/show-performance.html', data)
         pass
