@@ -47,7 +47,7 @@ class CreateFeature(BaseHandler):
             index=index)
         new_feature_performance.put()
 
-        self.redirect('/')  # 
+        self.redirect('/show-feature/%s' % new_feature.key.id()) # 
 
 
 class ListFeatures(BaseHandler):
@@ -117,7 +117,6 @@ class CreateFeatureBet(BaseHandler):
         performances = FeaturePerformance.query().fetch()
         data = {
             'features': features,
-            'performances': performances
         }
         return self.render('feature/create-feature-bet.html', data)
         
@@ -131,14 +130,19 @@ class CreateFeatureBet(BaseHandler):
 
         feature_key = self.request.get('feature_wanted')
         feature = Feature.get_by_id(int(feature_key))
+        logging.info("feature performances")
+        logging.info(feature.performances)
 
-        performance_key = self.request.get('performance_wanted')
-        performance = FeaturePerformance.get_by_id(int(performance_key))
+        performance = FeaturePerformance(feature.performances[0])
 
         options = self.request.get('options').split('\n')
         start_time = self.request.get('start_time')
+        start_time = datetime.strptime(start_time, "%Y-%m-%d")
         end_time = self.request.get('end_time')
+        end_time = datetime.strptime(end_time, "%Y-%m-%d")
+
         billing_time = self.request.get('billing_time')
+        billing_time = datetime.strptime(billing_time, "%Y-%m-%d")
 
         new_bet = FeatureBet(performance_bet=performance,
                             bet_options=options,
