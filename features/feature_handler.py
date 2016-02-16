@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from handlers import BaseHandler
-from feature_models import Feature, FeatureBet
+from feature_models import Feature, FeatureBet, FeaturePerformance
 from datetime import timedelta
 from user_data.user_models import UserData
 from google.appengine.api import memcache
@@ -101,12 +101,43 @@ class CreateFeatureBet(BaseHandler):
 
         # get all features and feature_performance to be chose
         # form page to create/update feature bet
-        pass
+        features = Feature.query().fetch()
+        performances = FeaturePerformance.query().fetch()
+        data = {
+            'features': features,
+            'performances': performances
+        }
+        return self.render('feature/create-feature-bet.html', data)
+        
 
     def post(self):
 
         # create or update feature bet
-        pass
+        user = UserData.get_current_user()
+        if not user.is_server_admin():  # make sure user has an account to create course
+            self.redirect('/')
+
+        feature_key = self.request.get('feature_wanted')
+        feature = Feature.get_by_id(int(feature_key))
+
+        performance_key = self.request.get('performance_wanted')
+        performance = FeaturePerformance.get_by_id(int(performance_key))
+
+        options = self.request.get('options').split('\n')
+        start_time = self.request.get('start_time')
+        end_time = self.request.get('end_time')
+        billing_time = self.request.get('billing_time')
+
+        new_bet = FeatureBet(performance_bet=performance,
+                            bet_options=options,
+                            start_time=start_time,
+                            end_time=end_time,
+                            billing_time=billing_time
+                            )
+
+        new_bet.put()
+
+        self.redirect('/')  # 
 
 
 class UpdateUserFeatureBet(BaseHandler):
